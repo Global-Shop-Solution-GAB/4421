@@ -1,0 +1,741 @@
+Program.Sub.ScreenSU.Start
+Gui.Form..Create
+Gui.Form..Caption("Parameter Selection")
+Gui.Form..Size(6255,4875)
+Gui.Form..MinX(0)
+Gui.Form..MinY(0)
+Gui.Form..Position(0,0)
+Gui.Form..BackColor(-2147483633)
+Gui.Form..MousePointer(0)
+Gui.Form..Sizeable(False)
+Gui.Form..Event(UnLoad,Form_UnLoad)
+Gui.Form.dtpBegDate.Create(DatePicker)
+Gui.Form.dtpBegDate.Size(1500,285)
+Gui.Form.dtpBegDate.Position(330,750)
+Gui.Form.dtpEndDate.Create(DatePicker)
+Gui.Form.dtpEndDate.Size(1500,285)
+Gui.Form.dtpEndDate.Position(2370,750)
+Gui.Form.lblBegDate.Create(Label,"Beginning Date",True,1290,255,0,375,450,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lblBegDate2.Create(Label,"Ending Date",True,1290,255,0,2370,435,True,0,"Arial",8,-2147483633,0)
+Gui.Form.chkAllShipDates.Create(CheckBox)
+Gui.Form.chkAllShipDates.Size(1860,360)
+Gui.Form.chkAllShipDates.Position(330,1215)
+Gui.Form.chkAllShipDates.Caption("All Shipping Dates")
+Gui.Form.chkAllShipDates.Event(Click,chkAllShipDates_Click)
+Gui.Form.lblBegSalesperson.Create(Label,"Beginning Salesperson",True,1935,255,0,360,2550,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lblEndingSalesperson.Create(Label,"Ending Salesperson",True,1755,255,0,3315,2550,True,0,"Arial",8,-2147483633,0)
+Gui.Form.txtBegSalesperson.Create(TextBox,"",True,1905,300,0,375,2790,True,0,"Arial",8,-2147483643,1)
+Gui.Form.txtEndingSalesperson.Create(TextBox,"",True,1905,300,0,3300,2805,True,0,"Arial",8,-2147483643,1)
+Gui.Form.cmdBegSalespersonBrwse.Create(Button)
+Gui.Form.cmdBegSalespersonBrwse.Size(525,375)
+Gui.Form.cmdBegSalespersonBrwse.Position(2400,2760)
+Gui.Form.cmdBegSalespersonBrwse.Caption("^")
+Gui.Form.cmdBegSalespersonBrwse.Event(Click,cmdBegSalespersonBrwse_Click)
+Gui.Form.cmdEndSalespersonBrwse.Create(Button)
+Gui.Form.cmdEndSalespersonBrwse.Size(525,375)
+Gui.Form.cmdEndSalespersonBrwse.Position(5310,2760)
+Gui.Form.cmdEndSalespersonBrwse.Caption("^")
+Gui.Form.cmdEndSalespersonBrwse.Event(Click,cmdEndSalespersonBrwse_Click)
+Gui.Form.chkAllSalespersons.Create(CheckBox)
+Gui.Form.chkAllSalespersons.Size(1770,360)
+Gui.Form.chkAllSalespersons.Position(345,3255)
+Gui.Form.chkAllSalespersons.Caption("All Salespersons")
+Gui.Form.chkAllSalespersons.Event(Click,chkAllSalespersons_Click)
+Gui.Form.cmdContinue.Create(Button)
+Gui.Form.cmdContinue.Size(1035,420)
+Gui.Form.cmdContinue.Position(315,3750)
+Gui.Form.cmdContinue.Caption("Continue")
+Gui.Form.cmdContinue.Event(Click,cmdContinue_Click)
+Gui.Form.cmdSOBrwse.Create(Button)
+Gui.Form.cmdSOBrwse.Size(525,375)
+Gui.Form.cmdSOBrwse.Position(2385,1920)
+Gui.Form.cmdSOBrwse.Caption("^")
+Gui.Form.cmdSOBrwse.Event(Click,cmdSOBrwse_Click)
+Gui.Form.txtSO.Create(TextBox,"",True,1905,300,0,330,1965,True,0,"Arial",8,-2147483643,1)
+Gui.Form.lblSO.Create(Label,"Sales Order",True,1245,255,0,315,1725,True,0,"Arial",8,-2147483633,0)
+Gui.FormDashBoard..Create
+Gui.FormDashBoard..Caption("Sales Order Detail Dashboard")
+Gui.FormDashBoard..Size(20445,10695)
+Gui.FormDashBoard..MinX(0)
+Gui.FormDashBoard..MinY(0)
+Gui.FormDashBoard..Position(0,0)
+Gui.FormDashBoard..BackColor(-2147483633)
+Gui.FormDashBoard..MousePointer(0)
+Gui.FormDashBoard..Event(UnLoad,FormDashBoard_UnLoad)
+Gui.FormDashBoard.GsGridControl1.Create(GsGridControl)
+Gui.FormDashBoard.GsGridControl1.Size(19755,8265)
+Gui.FormDashBoard.GsGridControl1.Position(210,1470)
+Gui.FormDashBoard.cmdExport.Create(Button)
+Gui.FormDashBoard.cmdExport.Size(1020,435)
+Gui.FormDashBoard.cmdExport.Position(18900,900)
+Gui.FormDashBoard.cmdExport.Caption("Export")
+Gui.FormDashBoard.cmdExport.Event(Click,cmdExport_Click)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+v.Global.sbegsalesperson.Declare(String)
+v.Global.sendingsalesperson.Declare(String)
+V.Local.sError.Declare(String)
+v.Global.so.Declare(String)
+
+'Coded by: WAW
+'Date: 4/19/17
+'This project will be for a Dashboard View that will allow the user to view all information pertaining to each line on a Sales Order(s).
+ 'This includes all Work Order information and Purchase Order information as well as the part information for that line.  
+
+'open connection'opening connection
+F.ODBC.Connection!conx.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+
+'display the form to allow the user to select parameters
+gui.Form..Visible(true)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Main.End
+
+Program.Sub.Form_UnLoad.Start
+F.Intrinsic.Control.SetErrorHandler("Form_Unload_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+'closing connection and ending program
+F.ODBC.Connection!conx.Close
+Function.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.Label("Form_Unload_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Form_UnLoad.End
+
+Program.Sub.cmdBegSalespersonBrwse_Click.Start
+F.Intrinsic.Control.SetErrorHandler("Form_UnLoad_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+Variable.Local.sRet.Declare(string)
+Variable.Local.sTemp.Declare(string)
+Variable.Local.sTitles.Declare(string)
+Variable.Local.iWidths.Declare(long)
+
+f.Intrinsic.UI.SetBrowserHotTypeAhead(True)
+
+Function.Intrinsic.String.Split("ID*!*Name*!*Email","*!*",variable.local.sTitles)
+Function.Intrinsic.String.Split("200*!*1000*!*800","*!*",variable.local.iWidths)
+Function.Intrinsic.UI.Browser("Select a Salesperson","conx","Select ID, NAME, EMAIL From V_SALESPERSONS",Variable.Local.sTitles,Variable.Local.iWidths,Variable.Local.sRet)
+Function.Intrinsic.Control.If(Variable.Local.sRet,"=","***CANCEL***")
+	 Function.Intrinsic.UI.Msgbox("No Salesperson was selected!")
+Function.Intrinsic.Control.Else
+	 Function.Intrinsic.String.Split(Variable.Local.sRet,"*!*",Variable.Local.sRet)
+	'set the textboxes
+	gui.Form.txtBegSalesperson.Text(v.Local.sRet(1))
+	gui.Form.txtEndingSalesperson.Text(v.Local.sRet(1))
+	v.Global.sbegsalesperson.Set(v.Local.sRet(0))
+	v.Global.sendingsalesperson.Set(v.Local.sRet(0))
+Function.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Form_UnLoad_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.cmdBegSalespersonBrwse_Click.End
+
+Program.Sub.cmdEndSalespersonBrwse_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdBegSalespersonBrwse_Click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+Variable.Local.sRet.Declare(string)
+Variable.Local.sTemp.Declare(string)
+Variable.Local.sTitles.Declare(string)
+Variable.Local.iWidths.Declare(long)
+
+Function.Intrinsic.String.Split("ID*!*Name*!*Email","*!*",variable.local.sTitles)
+Function.Intrinsic.String.Split("200*!*1000*!*800","*!*",variable.local.iWidths)
+Function.Intrinsic.UI.Browser("Select a Salesperson","conx","Select ID, NAME, EMAIL From V_SALESPERSONS",Variable.Local.sTitles,Variable.Local.iWidths,Variable.Local.sRet)
+Function.Intrinsic.Control.If(Variable.Local.sRet,"=","***CANCEL***")
+	 Function.Intrinsic.UI.Msgbox("No Salesperson was selected!")
+Function.Intrinsic.Control.Else
+	 Function.Intrinsic.String.Split(Variable.Local.sRet,"*!*",Variable.Local.sRet)
+	'set the textboxes
+	gui.Form.txtEndingSalesperson.Text(v.Local.sRet(1))
+	v.Global.sendingsalesperson.Set(v.Local.sRet(0))
+Function.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdBegSalespersonBrwse_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.cmdEndSalespersonBrwse_Click.End
+
+Program.Sub.cmdContinue_Click.Start
+F.Intrinsic.Control.SetErrorHandler("_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+'close the form
+gui.Form..Visible(false)
+
+'wait dialog
+f.Intrinsic.UI.InvokeWaitDialog("Generating data...")
+
+'call teh gather info sub
+f.Intrinsic.Control.CallSub(gatherdata)
+
+f.Intrinsic.UI.CloseWaitDialog
+
+'show the dashboard
+gui.FormDashBoard..Visible(True)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.cmdContinue_Click.End
+
+Program.Sub.FormDashBoard_UnLoad.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+gui.Form..Visible(false)
+gui.FormDashBoard..Visible(false)
+
+'closing connection and ending program
+F.ODBC.Connection!conx.Close
+Function.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.End
+
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.FormDashBoard_UnLoad.End
+
+Program.Sub.cmdExport_Click.Start
+F.Intrinsic.Control.SetErrorHandler("FormDashBoard_UnLoad_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+v.Local.sfilename.Declare(string)
+
+'open the save dialog
+F.Intrinsic.UI.ShowSaveFileDialog("","xlsx|*.xlsx",,V.Local.sfilename)
+f.Intrinsic.String.Build("{0}{1}",v.Local.sfilename,".csv",v.Local.sfilename)
+f.Intrinsic.Control.If(v.Local.sfilename,<>,"***CANCEL***")
+	'write to a csv
+	gui.FormDashBoard.GsGridControl1.Export(v.Local.sfilename,"csv")
+f.Intrinsic.Control.Else
+	'inform the user it didn't create the file
+	f.Intrinsic.UI.Msgbox("File Not Created")
+	f.Intrinsic.Control.ExitSub
+f.Intrinsic.Control.EndIf
+
+'tell user its done
+f.Intrinsic.UI.Msgbox("Export Complete")
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("FormDashBoard_UnLoad_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(formdashboard_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.cmdExport_Click.End
+
+Program.Sub.chkAllShipDates_Click.Start
+F.Intrinsic.Control.SetErrorHandler("FormDashBoard_UnLoad_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+'check the value of the checkbox
+f.Intrinsic.Control.If(v.Screen.Form!chkAllShipDates.Value,=,1)
+	gui.Form.dtpBegDate.Enabled(false)
+	gui.Form.dtpEndDate.Enabled(false)
+f.Intrinsic.Control.Else
+	gui.Form.dtpBegDate.Enabled(true)
+	gui.Form.dtpEndDate.Enabled(true)
+f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("FormDashBoard_UnLoad_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.chkAllShipDates_Click.End
+
+Program.Sub.chkAllSalespersons_Click.Start
+F.Intrinsic.Control.SetErrorHandler("chkAllShipDates_Click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+'check the value of the checkbox
+f.Intrinsic.Control.If(v.Screen.Form!chkAllSalespersons.Value,=,1)
+	gui.Form.txtBegSalesperson.Text("")
+	gui.Form.txtEndingSalesperson.Text("")
+	gui.Form.txtBegSalesperson.Enabled(false)
+	gui.Form.txtEndingSalesperson.Enabled(false)
+	gui.Form.cmdBegSalespersonBrwse.Enabled(false)
+	gui.Form.cmdEndSalespersonBrwse.Enabled(false)
+	v.Global.sbegsalesperson.Set("")
+	v.Global.sendingsalesperson.Set("")
+f.Intrinsic.Control.Else
+	gui.Form.txtBegSalesperson.Enabled(true)
+	gui.Form.txtEndingSalesperson.Enabled(true)
+	gui.Form.cmdBegSalespersonBrwse.Enabled(true)
+	gui.Form.cmdEndSalespersonBrwse.Enabled(true)
+f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("chkAllShipDates_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.chkAllSalespersons_Click.End
+
+Program.Sub.GatherData.Start
+F.Intrinsic.Control.SetErrorHandler("GatherData_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+v.Local.ssql.Declare(String)
+v.Local.i.Declare(long)
+v.Local.sret.Declare(string)
+v.Local.stypereturn.Declare(String)
+v.Local.sposql.Declare(String)
+v.Local.sporeturn.Declare(string)
+v.Local.sdatereturn.Declare(string)
+v.Local.sdatesql.Declare(string)
+v.Local.sqtysql.Declare(string)
+v.Local.sqtyreturn.Declare(string)
+v.Local.dbegdate.declare(date)
+v.Local.denddate.Declare(date)
+v.Local.drecv.Declare(date)
+v.Local.sdatercv.Declare(String)
+v.Local.sjobsql.Declare(string)
+v.Local.dnulldate.Declare(date)
+v.Local.dwoduedate.Declare(date)
+v.Local.dpoduedate.Declare(date)
+
+
+v.Local.dnulldate.Set("1/1/1900")
+
+'Sales Order, SO Line #, SO Line part #, SO Line Qty, SO Line Due Date, Sales Rep, Work Order, WO due date, Work order P/N, 
+'Quantity, Part Number, Purchase Order, Vendor, PO Quantity, Due Date, Date Received, Qty Received,Qty Open, Buyer, Qty available
+
+v.Local.dbegdate.Set(v.Screen.Form!dtpBegDate.Value)
+v.Local.denddate.Set(v.Screen.Form!dtpEndDate.Value)
+
+'check to see which parameters were selected
+f.Intrinsic.Control.If(v.Screen.Form!chkAllSalespersons.Value,=,1)
+	'check to see if all dates is selected
+	f.Intrinsic.Control.If(v.Screen.Form!chkAllShipDates.Value,=,1)
+		'check to see if there is a sales order selected
+		f.Intrinsic.Control.If(v.Screen.Form!txtSO.Text,=,"")
+			'build the query for all 
+			f.Intrinsic.String.Build("Select V_ORDER_LINES.DATE_SHIP, V_ORDER_LINES.ORDER_NO, V_ORDER_LINES.RECORD_NO, V_ORDER_LINES.PART, V_ORDER_LINES.QTY_ORDERED, V_ORDER_LINES.DATE_ITEM_PROM, V_ORDER_HEADER.SALESPERSON, V_ORDER_LINES.JOB, V_ORDER_LINES.SUFFIX from V_ORDER_LINES inner join V_ORDER_HEADER on V_ORDER_LINES.ORDER_NO = V_ORDER_HEADER.ORDER_NO where V_ORDER_LINES.ORDER_NO <> '{0}' and V_ORDER_HEADER.DATE_SHIPPED = '{1}'","",v.Local.dnulldate.PervasiveDate,v.Local.ssql)
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("Select V_ORDER_LINES.DATE_SHIP, V_ORDER_LINES.ORDER_NO, V_ORDER_LINES.RECORD_NO, V_ORDER_LINES.PART, V_ORDER_LINES.QTY_ORDERED, V_ORDER_LINES.DATE_ITEM_PROM, V_ORDER_HEADER.SALESPERSON, V_ORDER_LINES.JOB, V_ORDER_LINES.SUFFIX from V_ORDER_LINES inner join V_ORDER_HEADER on V_ORDER_LINES.ORDER_NO = V_ORDER_HEADER.ORDER_NO where V_ORDER_LINES.ORDER_NO = '{0}' and V_ORDER_HEADER.DATE_SHIPPED = '{1}'",v.Global.so.trim,v.Local.dnulldate.PervasiveDate,v.Local.ssql)
+		f.Intrinsic.Control.EndIf
+		
+	f.Intrinsic.Control.Else
+		'check to see if there is a sales order selected
+		f.Intrinsic.Control.If(v.Screen.Form!txtSO.Text,=,"")
+			f.Intrinsic.String.Build("Select V_ORDER_LINES.DATE_SHIP, V_ORDER_LINES.ORDER_NO, V_ORDER_LINES.RECORD_NO, V_ORDER_LINES.PART, V_ORDER_LINES.QTY_ORDERED, V_ORDER_LINES.DATE_ITEM_PROM, V_ORDER_HEADER.SALESPERSON, V_ORDER_LINES.JOB, V_ORDER_LINES.SUFFIX from V_ORDER_LINES inner join V_ORDER_HEADER on V_ORDER_LINES.ORDER_NO = V_ORDER_HEADER.ORDER_NO where V_ORDER_LINES.DATE_SHIP between '{0}' and '{1}' and V_ORDER_HEADER.DATE_SHIPPED = '{2}'",v.Local.dbegdate.PervasiveDate,v.Local.denddate.PervasiveDate,v.Local.dnulldate.PervasiveDate,v.Local.ssql)
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("Select V_ORDER_LINES.DATE_SHIP, V_ORDER_LINES.ORDER_NO, V_ORDER_LINES.RECORD_NO, V_ORDER_LINES.PART, V_ORDER_LINES.QTY_ORDERED, V_ORDER_LINES.DATE_ITEM_PROM, V_ORDER_HEADER.SALESPERSON, V_ORDER_LINES.JOB, V_ORDER_LINES.SUFFIX from V_ORDER_LINES inner join V_ORDER_HEADER on V_ORDER_LINES.ORDER_NO = V_ORDER_HEADER.ORDER_NO where V_ORDER_LINES.DATE_SHIP between '{0}' and '{1}' and V_ORDER_HEADER.ORDER_NO = '{2}' anD V_ORDER_HEADER.DATE_SHIPPED = '{3}'",v.Local.dbegdate.PervasiveDate,v.Local.denddate.PervasiveDate,v.Global.so.Trim,v.Local.dnulldate.PervasiveDate,v.Local.ssql)
+		f.Intrinsic.Control.endif	
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Else
+	'check to see if all dates is selected
+	f.Intrinsic.Control.If(v.Screen.Form!chkAllShipDates.Value,=,1)
+		f.Intrinsic.Control.If(v.Screen.Form!txtSO.Text,=,"")
+			f.Intrinsic.String.Build("Select V_ORDER_LINES.DATE_SHIP, V_ORDER_LINES.ORDER_NO, V_ORDER_LINES.RECORD_NO, V_ORDER_LINES.PART, V_ORDER_LINES.QTY_ORDERED, V_ORDER_LINES.DATE_ITEM_PROM, V_ORDER_HEADER.SALESPERSON, V_ORDER_LINES.JOB, V_ORDER_LINES.SUFFIX from V_ORDER_LINES inner join V_ORDER_HEADER on V_ORDER_LINES.ORDER_NO = V_ORDER_HEADER.ORDER_NO where V_ORDER_HEADER.SALESPERSON between '{0}' and '{1}'",v.Global.sbegsalesperson.trim,v.Global.sendingsalesperson.trim,v.Local.ssql)
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("Select V_ORDER_LINES.DATE_SHIP, V_ORDER_LINES.ORDER_NO, V_ORDER_LINES.RECORD_NO, V_ORDER_LINES.PART, V_ORDER_LINES.QTY_ORDERED, V_ORDER_LINES.DATE_ITEM_PROM, V_ORDER_HEADER.SALESPERSON, V_ORDER_LINES.JOB, V_ORDER_LINES.SUFFIX from V_ORDER_LINES inner join V_ORDER_HEADER on V_ORDER_LINES.ORDER_NO = V_ORDER_HEADER.ORDER_NO where V_ORDER_HEADER.SALESPERSON between '{0}' and '{1}' and V_ORDER_HEADER.ORDER_NO = '{2}'",v.Global.sbegsalesperson.trim,v.Global.sendingsalesperson.trim,v.Global.so,v.Local.ssql)
+		f.Intrinsic.Control.EndIf	
+	f.Intrinsic.Control.Else
+		f.Intrinsic.Control.If(v.Screen.Form!txtSO.Text,=,"")
+			f.Intrinsic.String.Build("Select V_ORDER_LINES.DATE_SHIP, V_ORDER_LINES.ORDER_NO, V_ORDER_LINES.RECORD_NO, V_ORDER_LINES.PART, V_ORDER_LINES.QTY_ORDERED, V_ORDER_LINES.DATE_ITEM_PROM, V_ORDER_HEADER.SALESPERSON, V_ORDER_LINES.JOB, V_ORDER_LINES.SUFFIX from V_ORDER_LINES inner join V_ORDER_HEADER on V_ORDER_LINES.ORDER_NO = V_ORDER_HEADER.ORDER_NO where V_ORDER_HEADER.SALESPERSON between '{0}' and '{1}' and V_ORDER_LINES.DATE_SHIP between '{2}' and '{3}' and V_ORDER_HEADER.DATE_SHIPPED = '{4}'",v.Global.sbegsalesperson.trim,v.Global.sendingsalesperson.trim,v.local.dbegdate.PervasiveDate,v.local.denddate.PervasiveDate,v.Local.dnulldate.PervasiveDate,v.Local.ssql)
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("Select V_ORDER_LINES.DATE_SHIP, V_ORDER_LINES.ORDER_NO, V_ORDER_LINES.RECORD_NO, V_ORDER_LINES.PART, V_ORDER_LINES.QTY_ORDERED, V_ORDER_LINES.DATE_ITEM_PROM, V_ORDER_HEADER.SALESPERSON, V_ORDER_LINES.JOB, V_ORDER_LINES.SUFFIX from V_ORDER_LINES inner join V_ORDER_HEADER on V_ORDER_LINES.ORDER_NO = V_ORDER_HEADER.ORDER_NO where V_ORDER_HEADER.SALESPERSON between '{0}' and '{1}' and V_ORDER_LINES.DATE_SHIP between '{2}' and '{3}' and V_ORDER_LINES.ORDER_NO = '{4}' and V_ORDER_HEADER.DATE_SHIPPED = '{5}'",v.Global.sbegsalesperson.trim,v.Global.sendingsalesperson.trim,v.local.dbegdate.PervasiveDate,v.local.denddate.PervasiveDate,v.Global.so,v.Local.dnulldate.PervasiveDate,v.Local.ssql)
+		f.Intrinsic.Control.EndIf	
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.EndIf
+
+'create the datatable and add additional fields
+f.Data.DataTable.CreateFromSQL("SO","conx",v.Local.ssql,true)
+f.Data.DataTable.AddColumn("SO","WO_DUEDATE","date","1/1/1900")
+f.Data.DataTable.AddColumn("SO","WO_PN","string")
+f.Data.DataTable.AddColumn("SO","WO_QTY","string")
+f.Data.DataTable.AddColumn("SO","PO","string")
+f.Data.DataTable.AddColumn("SO","PO_LINE","string")
+f.Data.DataTable.AddColumn("SO","Vendor","string")
+f.Data.DataTable.AddColumn("SO","PO_QTY","string")
+f.Data.DataTable.AddColumn("SO","PO_DUEDATE","date","1/1/1900")
+f.Data.DataTable.AddColumn("SO","DATE_RCV","string")
+f.Data.DataTable.AddColumn("SO","QTY_RCV","string")
+f.Data.DataTable.AddColumn("SO","QTY_OPEN","string")
+f.Data.DataTable.AddColumn("SO","BUYER","string")
+f.Data.DataTable.AddColumn("SO","QTY_AVAIL","string")
+f.Data.DataTable.AddColumn("SO","Queried","string")
+
+'loop through the datatable
+F.Intrinsic.Control.For(v.Local.i,v.dataTable.SO.RowCount--,0,-1)
+		'query the PO information in the SALES_ORD_COM table
+'		f.Intrinsic.String.Build("Select * from V_SALES_ORD_COM where ORDER_NO = '{0}' and ORDER_LINE = '{1}' ORDER by SEQ DESC",v.DataTable.SO(v.Local.i).ORDER_NO.fieldvaltrim,v.DataTable.SO(v.Local.i).RECORD_NO.fieldvaltrim,v.Local.stypereturn)
+		f.Intrinsic.String.Build("Select * from V_SALES_ORD_COM where ORDER_NO = '{0}' ORDER by SEQ DESC",v.DataTable.SO(v.Local.i).ORDER_NO.fieldvaltrim,v.Local.stypereturn)
+		F.ODBC.Connection!conx.OpenLocalRecordsetRO("rst",V.Local.stypereturn)
+		'see if there is data in the table
+		F.Intrinsic.Control.DoUntil(V.ODBC.conX!rst.EOF,=,True)
+			'add the values to the datatable
+			f.Data.DataTable.AddRow("SO","ORDER_NO",v.DataTable.SO(v.Local.i).ORDER_NO.fieldvaltrim,"RECORD_NO",v.DataTable.SO(v.Local.i).RECORD_NO.fieldvaltrim,"PART",v.DataTable.SO(v.Local.i).PART.fieldvaltrim,"QTY_ORDERED",v.DataTable.SO(v.Local.i).QTY_ORDERED.fieldvaltrim,"DATE_ITEM_PROM",v.DataTable.SO(v.Local.i).DATE_ITEM_PROM.fieldvaltrim,"SALESPERSON",v.DataTable.SO(v.Local.i).SALESPERSON.fieldvaltrim,"JOB",v.DataTable.SO(v.Local.i).JOB.fieldvaltrim,"SUFFIX",v.DataTable.SO(v.Local.i).SUFFIX.fieldvaltrim,"DATE_SHIP",v.DataTable.SO(v.Local.i).DATE_SHIP.fieldvaltrim,"PO",v.ODBC.conx!rst.FieldValTrim!PO,"PO_LINE",v.ODBC.conx!rst.FieldValTrim!PO_LINE,"PO_QTY",v.ODBC.conx!rst.FieldValTrim!QTY_PO,"QTY_RCV",v.ODBC.conx!rst.FieldValTrim!QTY_RECVD,"PO_DUEDATE",v.ODBC.conx!rst.FieldValTrim!PO_DUE_DATE)
+		F.ODBC.conx!rst.MoveNext
+		Function.Intrinsic.Control.Loop
+		f.ODBC.conx!rst.Close	
+'		f.Data.DataTable.DeleteRow("SO",v.Local.i)
+f.Intrinsic.Control.Next(v.Local.i)
+;
+f.Data.DataView.Create("SO","SOVIEW",22)
+
+F.Intrinsic.Control.For(v.Local.i,0,v.dataview.SO!SOVIEW.RowCount--,1)
+	f.Intrinsic.Control.If(v.DataVIew.SO!SOVIEW(v.Local.i).QUeried.fieldvaltrim,<>,"YES")
+		'query the PO information in the SALES_ORD_COM table
+		f.Intrinsic.String.Build("Select * from V_ORDER_TO_WO where ORDER_NO = '{0}'",v.DataVIew.SO!SOVIEW(v.Local.i).ORDER_NO.fieldvaltrim,v.Local.stypereturn)
+		F.ODBC.Connection!conx.OpenLocalRecordsetRO("rst",V.Local.stypereturn)
+		'see if there is data in the table
+		F.Intrinsic.Control.DoUntil(V.ODBC.conX!rst.EOF,=,True)
+			v.Local.dwoduedate.set(v.ODBC.conx!rst.FieldValTrim!DATE_JOB_DUE)
+			f.Data.DataTable.AddRow("SO","ORDER_NO",v.DataVIew.SO!SOVIEW(v.Local.i).ORDER_NO.fieldvaltrim,"RECORD_NO",v.DataVIew.SO!SOVIEW(v.Local.i).RECORD_NO.fieldvaltrim,"PART",v.DataVIew.SO!SOVIEW(v.Local.i).PART.fieldvaltrim,"QTY_ORDERED",v.DataVIew.SO!SOVIEW(v.Local.i).QTY_ORDERED.fieldvaltrim,"DATE_ITEM_PROM",v.DataVIew.SO!SOVIEW(v.Local.i).DATE_ITEM_PROM.fieldvaltrim,"SALESPERSON",v.DataVIew.SO!SOVIEW(v.Local.i).SALESPERSON.fieldvaltrim,"JOB",v.ODBC.conx!rst.FieldValTrim!JOB,"SUFFIX",v.ODBC.conx!rst.FieldValTrim!SUFFIX,"WO_DUEDATE",v.Local.dwoduedate.PervasiveDate,"WO_PN",v.ODBC.conx!rst.FieldValTrim!PART,"WO_QTY",v.ODBC.conx!rst.FieldValTrim!QTY_WO,"QUERIED","YES")
+		F.ODBC.conx!rst.MoveNext
+		Function.Intrinsic.Control.Loop
+		f.ODBC.conx!rst.Close	
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Next(v.Local.i)
+
+	'get the buyer for that PO and Vendor
+	v.Local.sposql.Set("SELECT  isnull(PURCHASE_ORDER,' ') as PO, isnull(BUYER,' ') as BUYER from V_PO_HEADER")
+	f.Data.Dictionary.CreateFromSQL("dict","conx",v.Local.sposql)
+	Function.Data.Dictionary.SetDefaultReturn("dict","")		
+	f.data.DataTable.FillFromDictionary("SO","dict","PO","BUYER")
+'	f.data.DataTable.FillFromDictionary("SO","dict","PO","VENDOR")		
+	f.Data.Dictionary.Close("dict")
+	
+	'get the buyer for that PO and Vendor
+	v.Local.sposql.Set("SELECT  isnull(PURCHASE_ORDER,' ') as PO, isnull(VENDOR,' ') as VENDOR from V_PO_HEADER")
+	f.Data.Dictionary.CreateFromSQL("dict","conx",v.Local.sposql)
+	Function.Data.Dictionary.SetDefaultReturn("dict","")		
+	f.data.DataTable.FillFromDictionary("SO","dict","PO","VENDOR")		
+	f.Data.Dictionary.Close("dict")	
+	
+	'Get the date last received from the lines table
+	v.Local.sdatesql.Set("SELECT  isnull(PURCHASE_ORDER,'') as PO, DATE_LAST_RECEIVED from V_PO_LINES")
+	f.Data.Dictionary.CreateFromSQL("dict","conx",v.Local.sdatesql)
+	Function.Data.Dictionary.SetDefaultReturn("dict","")		
+	f.data.DataTable.FillFromDictionary("SO","dict","PO","DATE_RCV")	
+	f.Data.Dictionary.Close("dict")
+	
+		'Get the date last received from the lines table
+'		f.Intrinsic.String.Build("Select DATE_LAST_RECEIVED from V_PO_LINES where PURCHASE_ORDER = '{0}' and RECORD_NO = '{1}'",v.DataTable.SO(v.Local.i).PO.fieldvaltrim,v.DataTable.SO(v.Local.i).PO_LINE.fieldvaltrim,v.Local.sdatesql)
+'		f.ODBC.Connection!conx.ExecuteAndReturn(v.Local.sdatesql,v.Local.sdatereturn)
+'		'check to see if date is blank
+'		f.Intrinsic.Control.If(v.Local.sdatereturn.Trim,<>,"")	
+'			v.Local.drecv.Set(v.Local.sdatereturn)
+'			v.Local.sdatercv.Set(v.Local.drecv)
+'			f.Intrinsic.String.Format(v.Local.sdatercv,"MM/DD/YYYY",v.Local.sdatercv)
+'			F.Data.DataTable.SetValue("SO",v.Local.i,"DATE_RCV",v.Local.sdatercv)
+'		f.Intrinsic.Control.EndIf
+		'Get the QTY available
+		f.Intrinsic.String.Build("Select QTY_ONHAND from V_INVENTORY_MSTR where PART = '{0}'",v.DataTable.SO(v.Local.i).PART.fieldvaltrim,v.Local.sqtysql)
+		f.ODBC.Connection!conx.ExecuteAndReturn(v.Local.sqtysql,v.Local.sqtyreturn)
+		'check to see if date is blank
+		f.Intrinsic.Control.If(v.Local.sqtyreturn.Trim,<>,"")	
+			F.Data.DataTable.SetValue("SO",v.Local.i,"QTY_AVAIL",v.Local.sqtyreturn)
+		f.Intrinsic.Control.EndIf
+
+		f.Intrinsic.String.Build("Select QTY_BO from V_ORDER_LINES where ORDER_NO = '{0}' and RECORD_NO = '{1}'",v.DataTable.SO(v.Local.i).ORDER_NO.fieldvaltrim,v.DataTable.SO(v.Local.i).RECORD_NO.fieldvaltrim,v.Local.sqtysql)
+		f.ODBC.Connection!conx.ExecuteAndReturn(v.Local.sqtysql,v.Local.sqtyreturn)
+		'check to see if date is blank
+		f.Intrinsic.Control.If(v.Local.sqtyreturn.Trim,<>,"")	
+			F.Data.DataTable.SetValue("SO",v.Local.i,"QTY_OPEN",v.Local.sqtyreturn)
+		f.Intrinsic.Control.EndIf
+
+
+v.Local.stest.Declare(string)
+'f.Intrinsic.String.Build("PO_DUEDATE is NUL
+f.Data.DataView.Create("SO","SOVIEW",22,"PO_DUEDATE is NULL","")
+f.Data.DataView.SetValue("SO","SOVIEW",-1,"PO_DUEDATE","1/1/1900")
+f.Data.DataView.Close("SO","SOVIEW")
+
+f.Data.DataView.Create("SO","WOVIEW",22,"WO_DUEDATE is NULL","")
+f.Data.DataView.SetValue("SO","WOVIEW",-1,"WO_DUEDATE","1/1/1900")
+f.Data.DataView.Close("SO","WOVIEW")
+'format the grid view
+f.Intrinsic.Control.CallSub(formatgrid)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("GatherData_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.GatherData.End
+
+Program.Sub.FormatGrid.Start
+F.Intrinsic.Control.SetErrorHandler("FormatGrid_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+v.Local.i.Declare(long)
+v.Local.dduedate.Declare(date)
+v.Local.sduedate.Declare(String)
+v.Local.dtoday.Declare(date)
+v.Local.stoday.Declare(String)
+v.Local.dwoduedate.Declare(date)
+v.Local.swoduedate.Declare(String)
+v.Local.spoduedate.Declare(string)
+v.Local.dpoduedate.Declare(date)
+
+'create the dataview
+f.Data.DataView.Create("SO","SO")
+
+'Sales Order, SO Line #, SO Line part #, SO Line Qty, SO Line Due Date, Sales Rep, Work Order, WO due date, Work order P/N, 
+'Quantity, Part Number, Purchase Order, Vendor, PO Quantity, Due Date, Date Received, Qty Received,Qty Open, Buyer, Qty available
+gui.FormDashBoard.GsGridControl1.AddGridviewFromDataview("SO","SO","SO")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","DATE_SHIP","Visible",False)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","ORDER_NO","Caption","Order")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","ORDER_NO","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","ORDER_NO","MinWidth","70")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","RECORD_NO","Caption","Line")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","RECORD_NO","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","RECORD_NO","MinWidth","50")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PART","Caption","Part")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PART","MinWidth","110")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PART","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_ORDERED","Caption","Qty Ordered")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_ORDERED","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_ORDERED","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_ORDERED","DisplayCustomNumeric","####.00")
+
+Gui.FormDashboard.GsGridControl1.SetGridviewProperty("SO","Multiselect", True)
+gui.FormDashboard.GsGridControl1.SetGridviewProperty("SO","AllowSort", True)
+Gui.FormDashboard.GsGridControl1.SetGridviewProperty("SO","AllowFilter", True)
+gui.FormDashboard.GsGridControl1.SetGridviewProperty("SO","OptionsDetailShowDetailTabs", False)
+Gui.FormDashboard.GsGridControl1.SetGridviewProperty("SO","OptionsViewShowGroupPanel", True)
+gui.FormDashboard.GsGridControl1.SetGridviewProperty("SO","EnableAppearanceOddRow",True)
+
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","DATE_ITEM_PROM","Caption","Due Date")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","DATE_ITEM_PROM","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","DATE_ITEM_PROM","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","DATE_ITEM_PROM","DisplayCustomDateTime","d")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","SALESPERSON","Caption","Salesperson")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","SALESPERSON","MinWidth","70")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","SALESPERSON","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","JOB","Caption","Job")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","JOB","MinWidth","70")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","JOB","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","SUFFIX","Caption","Suffix")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","SUFFIX","MinWidth","50")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","SUFFIX","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_DUEDATE","Caption","WO Due Date")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_DUEDATE","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_DUEDATE","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_DUEDATE","DisplayCustomDateTime","d")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_PN","Caption","WO Part")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_PN","MinWidth","110")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_PN","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_QTY","Caption","WO Qty")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_QTY","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_QTY","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","WO_QTY","DisplayCustomNumeric","####.00")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO","Caption","PO")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO","MinWidth","70")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_LINE","Caption","PO Line")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_LINE","MinWidth","50")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_LINE","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","Vendor","Caption","Vendor")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","VENDOR","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","VENDOR","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_QTY","Caption","PO Qty")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_QTY","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_QTY","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_QTY","DisplayCustomNumeric","####.00")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_DUEDATE","Caption","PO Due Date")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_DUEDATE","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_DUEDATE","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","PO_DUEDATE","DisplayCustomDateTime","d")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_RCV","Caption","Qty Rcv")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_RCV","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_RCV","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_RCV","DisplayCustomNumeric","####.00")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","DATE_RCV","Caption","Date Received")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","DATE_RCV","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","DATE_RCV","Headerfontbold",true)
+
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","DATE_RCV","DisplayCustomDateTime","d")
+
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_OPEN","Caption","Qty Open")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_OPEN","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_OPEN","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_OPEN","DisplayCustomNumeric","####.00")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","BUYER","Caption","Buyer")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","BUYER","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","BUYER","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_AVAIL","Caption","Qty Avail")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_AVAIL","MinWidth","80")
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_AVAIL","Headerfontbold",true)
+gui.FormDashBoard.GsGridControl1.SetColumnProperty("SO","QTY_AVAIL","DisplayCustomNumeric","####.00")
+
+gui.FormDashBoard.GsGridControl1.setGridviewProperty("SO","Editable",False)
+gui.FormDashBoard.GsGridControl1.setGridviewProperty("SO","AllowColumnMoving",False)
+
+'loop through the datatable
+F.Intrinsic.Control.For(v.Local.i,0,v.dataTable.SO.RowCount--,1)
+
+	f.Intrinsic.Control.If(v.DataTable.SO(v.Local.i).PO_DUEDATE!fieldval,<>,"1/1/1900")
+	f.Intrinsic.Control.andIf(v.DataTable.SO(v.Local.i).DATE_ITEM_PROM!fieldval,<>,"1/1/1900")
+		f.Intrinsic.Control.If(v.DataTable.SO(v.Local.i).PO_DUEDATE!fieldval,>,v.DataTable.SO(v.Local.i).DATE_ITEM_PROM!fieldval)
+			gui.FormDashBoard.GsGridControl1.SetRowAppearance("SO",v.Local.i,"Backcolor","yellow")
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.If(v.DataTable.SO(v.Local.i).WO_DUEDATE!fieldval,<>,"1/1/1900")
+		f.Intrinsic.Control.If(v.DataTable.SO(v.Local.i).WO_DUEDATE!fieldval,>,v.DataTable.SO(v.Local.i).DATE_ITEM_PROM!fieldval)
+			gui.FormDashBoard.GsGridControl1.SetRowAppearance("SO",v.Local.i,"Backcolor","yellow")
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+
+	f.Intrinsic.Control.If(v.DataTable.SO(v.Local.i).PO_DUEDATE!fieldval,<>,"1/1/1900")
+		f.Intrinsic.Control.If(v.DataTable.SO(v.Local.i).PO_DUEDATE!fieldval,<>,v.Ambient.Date.datecomp)
+			f.Intrinsic.Control.If(v.DataTable.SO(v.Local.i).PO_DUEDATE.fieldval,<,v.Ambient.Date)
+				gui.FormDashBoard.GsGridControl1.SetCellAppearance("SO",16,v.Local.i,"forecolor","red")
+			f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+
+	f.Intrinsic.Control.If(v.DataTable.SO(v.Local.i).WO_DUEDATE!fieldval,<>,"1/1/1900")
+		f.Intrinsic.Control.If(v.DataTable.SO(v.Local.i).PO_DUEDATE.fieldval,<,v.Ambient.Date)
+			gui.FormDashBoard.GsGridControl1.SetCellAppearance("SO",8,v.Local.i,"forecolor","red")
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Next(v.Local.i)
+
+gui.FormDashBoard.GsGridControl1.mainview("SO")
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("FormatGrid_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.FormatGrid.End
+
+Program.Sub.cmdSOBrwse_Click.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+Variable.Local.sRet.Declare(string)
+Variable.Local.sTemp.Declare(string)
+Variable.Local.sTitles.Declare(string)
+Variable.Local.iWidths.Declare(long)
+
+f.Intrinsic.UI.SetBrowserHotTypeAhead(True)
+
+Function.Intrinsic.String.Split("Sales Order*!*Customer*!*Due Date","*!*",variable.local.sTitles)
+Function.Intrinsic.String.Split("200*!*200*!*200","*!*",variable.local.iWidths)
+Function.Intrinsic.UI.Browser("Select a Sales Order","conx","Select distinct ORDER_NO, CUSTOMER, DATE_DUE From V_ORDER_HEADER",Variable.Local.sTitles,Variable.Local.iWidths,Variable.Local.sRet)
+Function.Intrinsic.Control.If(Variable.Local.sRet,"=","***CANCEL***")
+	 Function.Intrinsic.UI.Msgbox("No Sales Order was selected!")
+Function.Intrinsic.Control.Else
+	 Function.Intrinsic.String.Split(Variable.Local.sRet,"*!*",Variable.Local.sRet)
+	'set the textboxes
+	gui.Form.txtSO.Text(v.Local.sRet(0))
+	v.Global.so.Set(v.Local.sRet(0))
+Function.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4421_SO_Detail_Dash.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.cmdSOBrwse_Click.End
+
+Program.Sub.Comments.Start
+${$0$}$GCG_4421_SO_Detail_Dash.g2u$}$WAW$}$4/19/2017 12:19:12 PM$}$False
+${$3$}$0$}$$}$0$}$-1$}$$}$12:00:00 AM$}$This will be a custom GAB script that will run from a custom Menu Item under Bill of Material -> File -> Custom Cobalt BOM Import.  The user will navigate to the xml file that needs to be loaded into Global Shop.  Once the xml is parsed there will be a search in Global Shop to see if a BOM already exists for that Part Number.  If one already exists a compare screen will display showing the differences between the two.  If one does not exist then the screen will display the BOM as it will be uploaded into Global Shop.  Any parts that are listed in the BOM that are not Inventory Parts will be highlighted in Yellow.  If there are any parts not in inventory the user will have the option to click the create Parts button to generate those parts in Global Shop.  If the BOM exists in Global shop then any differences on the new import will be highlighted in Red.  After the Parts have been created then the Upload button will upload and override any previous BOM for that part.
+Program.Sub.Comments.End
